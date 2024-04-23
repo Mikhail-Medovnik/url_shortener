@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
+    <title>Document</title>
+  </head>
+  <style>
+    * {
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    .wrapper {
+      background: linear-gradient(109.6deg, rgb(245, 239, 249) 30.1%, rgb(207, 211, 236) 100.2%);
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .content {
+      min-width: 400px;
+      column-gap: 16px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      row-gap: 24px;
+      align-items: center;
+    }
+
+    .input-wrapper {
+      display: flex;
+      column-gap: 10px;
+      flex: 1;
+    }
+
+    .input-box {
+      width: 100%;
+    }
+
+    input {
+      padding-inline: 16px;
+      padding-block: 8px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      flex: 1;
+    }
+
+    label {
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .short-url {
+      span,
+      a {
+        font-size: 21px;
+        font-weight: 500;
+      }
+    }
+
+    button {
+      padding-inline: 16px;
+      padding-block: 8px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      background-color: #ffe87c;
+      transition: background-color 300ms ease;
+      font-weight: 500;
+    }
+
+    button:hover {
+      background-color: #ffefa8;
+      cursor: pointer;
+    }
+  </style>
+  <body>
+    <div class="wrapper">
+      <div class="content">
+        <div class="input-box">
+          <div class="input-wrapper">
+            <input type="text" id="url" name="longUrl" placeholder="Long URL" />
+            <button class="button">Shorten</button>
+          </div>
+        </div>
+
+        <div class="short-url"></div>
+      </div>
+    </div>
+    <script>
+      const button = document.querySelector('.button');
+      const input = document.querySelector('input');
+      console.log(input);
+
+      button.addEventListener('click', () => sendLongUrl(input.value));
+
+      async function sendLongUrl(inputValue) {
+        const response = await fetch('http://localhost:3000/shorten', {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(inputValue),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const linkContainer = document.querySelector('.short-url');
+            const span = document.createElement('span');
+            const link = document.createElement('a');
+            const path = `${window.location.origin}/s/${data.shortUrl}`;
+            span.textContent = 'Short URL: ';
+            link.textContent = data.shortUrl;
+            link.href = path;
+
+            linkContainer.appendChild(span);
+            linkContainer.appendChild(link);
+          });
+      }
+    </script>
+  </body>
+</html>
