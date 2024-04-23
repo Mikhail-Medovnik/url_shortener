@@ -16,6 +16,14 @@ async function addUrlPairToDb(longUrl: string, shortUrl: string, req: FastifyReq
   }
 }
 
+function urlCheck(str: string) {
+  try {
+    return Boolean(new URL(str));
+  } catch (error) {
+    return false;
+  }
+}
+
 export async function routes(fastify: FastifyInstance) {
   fastify.get('/', (_, res) => {
     const stream = fs.createReadStream('src/index.html');
@@ -24,10 +32,11 @@ export async function routes(fastify: FastifyInstance) {
 
   fastify.get('/s/:id', async (req, res) => {
     const { id } = req.params as { id: string };
-    console.log('id', id);
 
     const storedItems: UrlPair[] = await req.server.sql`
     SELECT * FROM "url"`;
+
+    console.log('SORTED ITEMS', storedItems);
 
     const urlPair = storedItems.find((item) => item.shorturl === id);
 
@@ -46,7 +55,18 @@ export async function routes(fastify: FastifyInstance) {
       readable: false,
     }) as string;
 
+    const isUrlValid = urlCheck(longUrl);
+
+    if (!isUrlValid) {
+      const defaultUrlConstructor = `https://www.${longUrl}`;
+
+      addUrlPairToDb(defaultUrlConstructor, shortUrl, req);
+
+      return { longUrl: defaultUrlConstructor, shortUrl };
+    }
+
     addUrlPairToDb(longUrl, shortUrl, req);
+
     return { longUrl, shortUrl };
   });
 }

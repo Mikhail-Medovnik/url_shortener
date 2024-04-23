@@ -18,7 +18,7 @@ const server = fastify({
 server.register(helmet);
 server.register(formBody);
 server.register(RateLimit, {
-  max: 20,
+  max: 999999,
   timeWindow: '1 minute',
 });
 server.register(fastifyHtml);

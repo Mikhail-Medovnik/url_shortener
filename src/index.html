@@ -115,6 +115,7 @@
           .then((res) => res.json())
           .then((data) => {
             const linkContainer = document.querySelector('.short-url');
+            linkContainer.innerHTML = '';
             const span = document.createElement('span');
             const link = document.createElement('a');
             const path = `${window.location.origin}/s/${data.shortUrl}`;
